@@ -30,43 +30,43 @@ TextAnimationHandler handler;
 
     public void WriteText()
     {
-        if (!typing) 
+        if (!typing && !(NewText == string.Empty)) 
         StartCoroutine(TypeLine());
     }
 
     IEnumerator TypeLine()
     {
         typing = true;
-        SpawnWord();
-        
+
         foreach (char c in NewText.ToCharArray())
         {
             if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == '\''))
             {
                 word += c;
-                textComponent.text = word;
             }
 
             else    
             {
-                handler.StartMoving();
                 SpawnWord();
+                yield return new WaitForSeconds(textSpeed);
+                handler.StartMoving();
             }
-
-            yield return new WaitForSeconds(textSpeed);
         }
-
+        SpawnWord();
+        yield return new WaitForSeconds(textSpeed);
         handler.StartMoving();
+
         typing = false;
     }
 
     void SpawnWord()
     {
         GameObject obj = Instantiate(TextBox, TextList);
-        textComponent = obj.transform.Find("Text").GetComponent<TextMeshPro>();
+        textComponent = obj.transform.GetChild(0).GetComponent<TextMeshPro>();
         handler = obj.GetComponent<TextAnimationHandler>();
-        word = string.Empty;
         textComponent.text = word;
+        word = string.Empty;
+        handler.FadeIn();
     }
 }
 

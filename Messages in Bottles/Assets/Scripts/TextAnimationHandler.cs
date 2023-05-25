@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class TextAnimationHandler : MonoBehaviour
 {
@@ -11,11 +12,14 @@ public bool startMoving;
 
 [Header("Animation")]
 Animator animator;
+TMP_Text textComponent;
 
-    void Start()
+    void Awake()
     {
         Bottle = GameObject.Find("Cylinder");
-        animator = GetComponent<Animator>();
+        animator = transform.GetChild(0).GetComponent<Animator>();
+        textComponent = transform.GetChild(0).GetComponent<TextMeshPro>();
+        startMoving = false;
     }
 
     void Update()
@@ -29,17 +33,24 @@ Animator animator;
         if (Vector3.Distance(transform.position, Bottle.transform.position) < 1f)
         {
             startMoving = false;
+            //transform.RotateAround(Bottle.transform.position, new Vector3(0, 1, 0), 2f*Time.deltaTime);
             return;
         }
-        
-        animator.SetBool("isBobbing", true);
+
         transform.LookAt(Bottle.transform);
-        transform.position = new Vector3(0, 0, 1f*Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, Bottle.transform.position, 1.5f*Time.deltaTime);
         
     }
     
     public void StartMoving()
     {
         startMoving = true;
+        animator.SetBool("isFading", false);
+        animator.SetBool("isBobbing", true);
+    }
+
+    public void FadeIn()
+    {
+        animator.SetBool("isFading", true);
     }
 }
